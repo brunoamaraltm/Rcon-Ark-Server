@@ -1,20 +1,24 @@
 package gui;
 
 import java.awt.EventQueue;
+import java.io.IOException;
 
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.JLabel;
-import javax.swing.JSpinner;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+
+import net.kronos.rkon.core.Rcon;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Home {
 
-	private JFrame frame;
+	public JFrame frame;
 	private JTextField restartMessage;
 	private JTextField chatLog;
 	private JTable table;
@@ -48,7 +52,7 @@ public class Home {
 	 */
 	private void initialize() {
 		frame = new JFrame();
-		frame.setBounds(100, 100, 544, 369);
+		frame.setBounds(100, 100, 554, 369);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -64,6 +68,13 @@ public class Home {
 		
 		chatLog = new JTextField();
 		chatLog.setBounds(10, 42, 405, 250);
+		Login login = new Login();
+		try {
+			chatLog.setText(login.rcon.command("getchat"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		frame.getContentPane().add(chatLog);
 		chatLog.setColumns(10);
 		
@@ -99,6 +110,17 @@ public class Home {
 		frame.getContentPane().add(btnSendCommand);
 		
 		JButton btnRestart = new JButton("Restart");
+		btnRestart.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Thread.sleep((Integer) restartTime.getValue()*1000);
+					System.out.println("OK");
+				} catch (NumberFormatException | InterruptedException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		btnRestart.setBounds(425, 10, 103, 23);
 		frame.getContentPane().add(btnRestart);
 	}

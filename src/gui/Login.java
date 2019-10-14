@@ -4,14 +4,14 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JSpinner;
 import javax.swing.JTextField;
 
 import connection.ServerConnection;
@@ -24,6 +24,7 @@ public class Login {
 	private JTextField ipText;
 	private JTextField rconPortText;
 	private JTextField passwordText;
+	protected Rcon rcon;
 
 	/**
 	 * Launch the application.
@@ -95,11 +96,30 @@ public class Login {
 					JOptionPane.showMessageDialog(null, "Preencha todos os campos", "Erro", JOptionPane.ERROR_MESSAGE);
 				} else {
 					try {
-						Rcon rcon = ServerConnection.conectarRcon(ip, Integer.parseInt(port), password);
+						rcon = ServerConnection.conectarRcon(ip, Integer.parseInt(port), password);
+						if (rcon != null) {
+							Home home = new Home();
+							home.frame.setVisible(true);
+							frmRconLogin.setVisible(false);
+							frmRconLogin.dispose();
+						} else {
+							//System.out.println("Não conectou");
+						}
+					} catch (ConnectException e2) {
+						JOptionPane.showMessageDialog(null, "O tempo de conexão expirou", "Erro", JOptionPane.ERROR_MESSAGE);
+						
+					} catch (SocketException e2) {
+						JOptionPane.showMessageDialog(null, "O IP não é valido", "Erro", JOptionPane.ERROR_MESSAGE);
+						
+					} catch (UnknownHostException e2) {
+						JOptionPane.showMessageDialog(null, "O servidor não foi encontrado", "Erro", JOptionPane.ERROR_MESSAGE);
 						
 					} catch (NumberFormatException | IOException | AuthenticationException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
+						
+					} catch (IllegalArgumentException e2) {
+						JOptionPane.showMessageDialog(null, "A porta excedeu o número de caracteres", "Erro", JOptionPane.ERROR_MESSAGE);
+						
 					}
 				}
 				
