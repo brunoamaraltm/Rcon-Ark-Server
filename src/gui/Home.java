@@ -1,20 +1,22 @@
 package gui;
 
 import java.awt.EventQueue;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-
-import net.kronos.rkon.core.Rcon;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 public class Home {
 
@@ -23,6 +25,8 @@ public class Home {
 	private JTextField chatLog;
 	private JTable table;
 	private JTextField commandText;
+	private int contador;
+	private JButton btnRestart = new JButton("Restart");
 
 	/**
 	 * Launch the application.
@@ -60,7 +64,9 @@ public class Home {
 		restartMessage.setBounds(130, 11, 243, 20);
 		frame.getContentPane().add(restartMessage);
 		restartMessage.setColumns(10);
+		restartMessage.setText("The server will restart in %s minutes");
 		String mensagemRestart = restartMessage.getText();
+		
 		
 		JLabel lblRestartMessage = new JLabel("Restart Message:");
 		lblRestartMessage.setBounds(10, 14, 110, 14);
@@ -69,16 +75,26 @@ public class Home {
 		chatLog = new JTextField();
 		chatLog.setBounds(10, 42, 405, 250);
 		Login login = new Login();
-		try {
+		/*try {
 			chatLog.setText(login.rcon.command("getchat"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		frame.getContentPane().add(chatLog);
 		chatLog.setColumns(10);
 		
 		JSpinner restartTime = new JSpinner();
+		restartTime.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				String replaced = mensagemRestart.replace("%s", restartTime.getValue().toString());
+				restartMessage.setText(replaced);
+			}
+		});
+		
+		String replaced = mensagemRestart.replace("%s", restartTime.getValue().toString());
+		restartMessage.setText(replaced);
+		
 		restartTime.setBounds(372, 11, 43, 20);
 		frame.getContentPane().add(restartTime);
 		
@@ -109,13 +125,12 @@ public class Home {
 		btnSendCommand.setBounds(425, 302, 103, 23);
 		frame.getContentPane().add(btnSendCommand);
 		
-		JButton btnRestart = new JButton("Restart");
 		btnRestart.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				int rightTime = (Integer) restartTime.getValue()+1;
 				try {
-					Thread.sleep((Integer) restartTime.getValue()*1000);
-					System.out.println("OK");
-				} catch (NumberFormatException | InterruptedException e1) {
+					useTime(rightTime);
+				} catch (NumberFormatException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
@@ -123,5 +138,25 @@ public class Home {
 		});
 		btnRestart.setBounds(425, 10, 103, 23);
 		frame.getContentPane().add(btnRestart);
+	}
+	private void useTime(int rightTime) {
+		Timer timer = new Timer();
+		contador = 1;
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				btnRestart.setEnabled(false);
+				btnRestart.setText("Left: "+(rightTime - contador));
+				if (contador == rightTime) {
+					System.out.println("The server will restart now");
+					btnRestart.setText("Restart");
+					btnRestart.setEnabled(true);
+					timer.cancel();
+				} else {
+					System.out.println("The server will restart in " + (rightTime - contador) + " minutes");
+				}
+				contador++;
+			}
+		}, 0, 1*1000);
 	}
 }
