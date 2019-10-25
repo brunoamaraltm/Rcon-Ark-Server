@@ -24,7 +24,7 @@ public class Login {
 	private JTextField ipText;
 	private JTextField rconPortText;
 	private JTextField passwordText;
-	protected Rcon rcon;
+	protected static Rcon rcon = null;
 
 	/**
 	 * Launch the application.
@@ -73,6 +73,8 @@ public class Login {
 		passwordText.setBounds(82, 73, 131, 20);
 		frmRconLogin.getContentPane().add(passwordText);
 		passwordText.setColumns(10);
+		
+		frmRconLogin.setLocationRelativeTo(null);
 		
 		JLabel lblIp = new JLabel("IP:");
 		lblIp.setBounds(10, 14, 72, 14);
